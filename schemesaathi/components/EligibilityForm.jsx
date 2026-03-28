@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useLang } from '@/context/LanguageContext';
 import { matchSchemes } from '@/lib/matchSchemes';
 import AnimateOnScroll from './AnimateOnScroll';
+import ApplicationModal from '@/components/ApplicationModal';
 
 const EligibilityForm = () => {
   const { lang, t } = useLang();
@@ -26,6 +27,20 @@ const EligibilityForm = () => {
   const [results, setResults] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedScheme, setSelectedScheme] = useState(null);
+
+  const handleApplyNow = (scheme) => {
+    setSelectedScheme(scheme);
+    setShowModal(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedScheme(null);
+    document.body.style.overflow = 'unset';
+  };
 
   const states = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
@@ -411,8 +426,9 @@ const EligibilityForm = () => {
 
                           {/* Action Button */}
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, boxShadow: '0 8px 25px rgba(19,136,8,0.35)' }}
                             whileTap={{ scale: 0.95 }}
+                            onClick={() => handleApplyNow(scheme)}
                             className="mt-4 w-full bg-primary text-white font-black py-4 rounded-2xl shadow-2xl shadow-primary/30 hover:bg-green-700 transition-all duration-300 text-xl flex justify-center items-center gap-3 border-b-4 border-green-900"
                           >
                             {t.applyNow}
@@ -459,6 +475,16 @@ const EligibilityForm = () => {
           )}
         </div>
       </div>
+
+      {/* Application Processing Modal */}
+      <AnimatePresence>
+        {showModal && selectedScheme && (
+          <ApplicationModal
+            scheme={selectedScheme}
+            onClose={handleCloseModal}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 };

@@ -31,7 +31,6 @@ const translations = {
     incomePlaceholder: 'Enter annual income in ₹ (e.g. 240000)',
     resultsHeading: 'Schemes found for',
     eligibleBadge: 'Eligible ✓',
-    // New translations for Eligibility Engine
     formGender: 'Gender',
     formIsWidow: 'Are you a widow?',
     formWidowYes: 'Yes',
@@ -43,6 +42,20 @@ const translations = {
     searchAgain: '← Search Again',
     editProfile: '← Edit My Profile',
     benefitLabel: 'Benefit',
+    // Modal translations
+    modalApplyingFor: 'Applying For',
+    modalStep1Title: 'Application Processing',
+    modalStep1Sub: 'Submitting your application to the ministry portal...',
+    modalStep2Title: 'DigiLocker Access Taken',
+    modalStep2Sub: 'Fetching your Aadhaar, income certificate & documents securely...',
+    modalStep3Title: 'Application Completed!',
+    modalStep3Sub: 'Your application has been successfully submitted. You will receive updates on WhatsApp/SMS.',
+    modalDone: 'Done ✓',
+    modalWaiting: 'Please wait — securely processing your application...',
+    modalSuccess: '🎉 Application Submitted!',
+    modalSuccessSub: 'You will receive real-time updates on WhatsApp & SMS as your application moves through the ministry.',
+    modalTrackingId: 'Application Tracking ID',
+    modalClose: 'Done — Back to Schemes',
   },
   hi: {
     navHome: 'होम',
@@ -76,7 +89,6 @@ const translations = {
     incomePlaceholder: 'वार्षिक आय ₹ में दर्ज करें (जैसे 240000)',
     resultsHeading: 'के लिए मिली योजनाएं',
     eligibleBadge: 'पात्र ✓',
-    // New translations for Hindi
     formGender: 'लिंग',
     formIsWidow: 'क्या आप विधवा हैं?',
     formWidowYes: 'हाँ',
@@ -88,6 +100,20 @@ const translations = {
     searchAgain: '← फिर से खोजें',
     editProfile: '← प्रोफाइल बदलें',
     benefitLabel: 'लाभ',
+    // Modal translations
+    modalApplyingFor: 'आवेदन कर रहे हैं',
+    modalStep1Title: 'आवेदन प्रक्रिया जारी है',
+    modalStep1Sub: 'मंत्रालय पोर्टल पर आवेदन जमा किया जा रहा है...',
+    modalStep2Title: 'DigiLocker एक्सेस लिया गया',
+    modalStep2Sub: 'आपका आधार, आय प्रमाण पत्र और दस्तावेज़ सुरक्षित रूप से प्राप्त किए जा रहे हैं...',
+    modalStep3Title: 'आवेदन पूर्ण हुआ!',
+    modalStep3Sub: 'आपका आवेदन सफलतापूर्वक जमा हो गया है। आपको WhatsApp/SMS पर अपडेट मिलेगा।',
+    modalDone: 'हो गया ✓',
+    modalWaiting: 'कृपया प्रतीक्षा करें — आपका आवेदन सुरक्षित रूप से संसाधित हो रहा है...',
+    modalSuccess: '🎉 आवेदन जमा हो गया!',
+    modalSuccessSub: 'मंत्रालय में आवेदन आगे बढ़ने पर आपको WhatsApp और SMS पर रियल-टाइम अपडेट मिलेगा।',
+    modalTrackingId: 'आवेदन ट्रैकिंग आईडी',
+    modalClose: 'हो गया — योजनाओं पर वापस जाएं',
   }
 }
 
