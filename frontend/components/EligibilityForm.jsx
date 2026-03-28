@@ -30,6 +30,25 @@ const EligibilityForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedScheme, setSelectedScheme] = useState(null);
 
+  // Score a scheme to find the best one
+  const scoreScheme = (scheme) => {
+    let score = 0;
+    const b = (scheme.benefit_amount || '').toLowerCase();
+    const lakhMatch = b.match(/(\d+\.?\d*).*lakh/);
+    if (lakhMatch) score += parseFloat(lakhMatch[1]) * 100;
+    if (b.includes('monthly') || b.includes('pension')) score += 150;
+    if (scheme.widow_specific) score += 80;
+    if ((scheme.category || '').toLowerCase() === 'housing') score += 120;
+    if ((scheme.category || '').toLowerCase() === 'education') score += 100;
+    if ((scheme.category || '').toLowerCase() === 'agriculture') score += 90;
+    return score;
+  };
+
+  // Compute best scheme from results
+  const bestScheme = results.length > 0
+    ? [...results].sort((a, b) => scoreScheme(b) - scoreScheme(a))[0]
+    : null;
+
   const handleApplyNow = (scheme) => {
     setSelectedScheme(scheme);
     setShowModal(true);
@@ -317,6 +336,63 @@ const EligibilityForm = () => {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="mt-12"
               >
+                {/* ── BEST SCHEME SPOTLIGHT ── */}
+                {bestScheme && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="mb-10"
+                  >
+                    {/* Crown badge - sits ABOVE the card */}
+                    <div className="flex justify-center mb-[-18px] relative z-10">
+                      <span className="bg-yellow-400 text-yellow-900 text-sm font-black px-8 py-2 rounded-full uppercase tracking-widest shadow-2xl border-2 border-yellow-500 flex items-center gap-2">
+                        🏆 #1 Best Match For You
+                      </span>
+                    </div>
+                    <div
+                      className="rounded-3xl shadow-2xl border-4 border-yellow-400 pt-8 pb-6 px-8"
+                      style={{ background: 'linear-gradient(135deg, #1a3a1a 0%, #0f2010 100%)' }}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                        <div>
+                          <span className="text-yellow-400 text-xs font-black uppercase tracking-widest block mb-1">{bestScheme.category} · {bestScheme.ministry}</span>
+                          <h3 className="text-2xl md:text-3xl font-black text-white leading-tight">{bestScheme.scheme_name}</h3>
+                        </div>
+                        <span className="shrink-0 bg-green-500 text-white text-[10px] font-black px-4 py-2 rounded-full border-b-4 border-green-800 shadow-xl uppercase animate-pulse">
+                          {t.eligibleBadge}
+                        </span>
+                      </div>
+                      {/* Benefit */}
+                      <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-2xl px-6 py-4 mb-4 flex items-center gap-4">
+                        <span className="text-4xl">💰</span>
+                        <div>
+                          <p className="text-yellow-300/60 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{lang === 'en' ? 'Top Benefit For You' : 'आपके लिए सबसे बड़ा लाभ'}</p>
+                          <p className="text-xl font-black text-yellow-300">{bestScheme.benefit_amount}</p>
+                        </div>
+                      </div>
+                      {/* Why best */}
+                      <div className="bg-white/5 rounded-xl px-5 py-3 mb-5 flex items-start gap-3">
+                        <span className="text-green-400 text-lg mt-0.5">✅</span>
+                        <p className="text-green-200 text-sm font-bold leading-relaxed">
+                          {lang === 'en'
+                            ? `Based on your profile — ${bestScheme.why_eligible}`
+                            : `आपकी प्रोफ़ाइल के आधार पर — ${bestScheme.why_eligible}`
+                          }
+                        </p>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => handleApplyNow(bestScheme)}
+                        className="w-full bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-black py-4 rounded-2xl text-lg shadow-2xl transition-all border-b-4 border-yellow-600 flex items-center justify-center gap-2"
+                      >
+                        🚀 {lang === 'en' ? 'Apply for This First →' : 'पहले इसके लिए आवेदन करें →'}
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Results Header */}
                 <div className="text-center mb-10">
                   <motion.div
@@ -484,6 +560,7 @@ const EligibilityForm = () => {
           <ApplicationModal
             scheme={selectedScheme}
             onClose={handleCloseModal}
+            citizenProfile={formData}
           />
         )}
       </AnimatePresence>

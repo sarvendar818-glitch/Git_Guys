@@ -1,19 +1,58 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { useLang } from '@/context/LanguageContext'
 
-export default function ApplicationModal({ scheme, onClose }) {
-  const { t } = useLang()
+export default function ApplicationModal({ scheme, onClose, citizenProfile }) {
+  const { lang, t } = useLang()
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState([])
   const [isFinished, setIsFinished] = useState(false)
 
-  // Generate tracking ID once on mount
+  // Generate tracking ID + random progress once on mount
   const trackingId = useMemo(() => {
     const rand = Math.random().toString(36).substring(2, 8).toUpperCase()
-    return `SS-${rand}-${new Date().getFullYear()}`
+    const stateCode = (citizenProfile?.state || 'IN').substring(0, 2).toUpperCase()
+    return `SS-${stateCode}-${rand}-${new Date().getFullYear()}`
   }, [])
+
+  // Random progress: 30, 70, or 100
+  const progress = useMemo(() => [30, 70, 100][Math.floor(Math.random() * 3)], [])
+
+  // Save to localStorage when finished
+  useEffect(() => {
+    if (!isFinished) return
+    try {
+      const existing = JSON.parse(localStorage.getItem('ss_applications') || '[]')
+      const alreadySaved = existing.some(a => a.trackingId === trackingId)
+      if (alreadySaved) return
+      const newApp = {
+        trackingId,
+        progress,
+        scheme_name: scheme?.scheme_name || '',
+        ministry: scheme?.ministry || '',
+        benefit_amount: scheme?.benefit_amount || '',
+        category: scheme?.category || '',
+        how_to_apply: scheme?.how_to_apply || '',
+        applied_at: new Date().toISOString(),
+        profile: {
+          name: citizenProfile?.name || 'Citizen',
+          state: citizenProfile?.state || '',
+          category: citizenProfile?.category || '',
+          gender: citizenProfile?.gender || '',
+          occupation: citizenProfile?.occupation || '',
+          familySize: citizenProfile?.familySize || '',
+          isWidow: citizenProfile?.isWidow || false,
+        }
+      }
+      existing.push(newApp)
+      localStorage.setItem('ss_applications', JSON.stringify(existing))
+    } catch (err) {
+      console.error('Failed to save application', err)
+    }
+  }, [isFinished])
 
   const STEPS = [
     {
@@ -251,7 +290,10 @@ export default function ApplicationModal({ scheme, onClose }) {
                   {t.modalSuccess}
                 </h4>
                 <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                  {t.modalSuccessSub}
+                  {lang === 'en'
+                    ? 'Your application is saved. Track its progress anytime from your dashboard.'
+                    : 'आपका आवेदन सुरक्षित है। अपने डैशबोर्ड से कभी भी प्रगति ट्रैक करें।'
+                  }
                 </p>
 
                 {/* Tracking ID */}
@@ -264,14 +306,24 @@ export default function ApplicationModal({ scheme, onClose }) {
                   </p>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(19,136,8,0.3)' }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={onClose}
-                  className="w-full bg-primary text-white font-bold py-3.5 rounded-2xl text-sm shadow-lg hover:bg-green-700 transition-colors duration-300"
-                >
-                  {t.modalClose}
-                </motion.button>
+                <div className="flex flex-col gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(19,136,8,0.3)' }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => { onClose(); router.push('/tracker') }}
+                    className="w-full bg-primary text-white font-bold py-3.5 rounded-2xl text-sm shadow-lg hover:bg-green-700 transition-colors duration-300 flex items-center justify-center gap-2"
+                  >
+                    📊 Track My Progress
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={onClose}
+                    className="w-full border-2 border-gray-200 text-gray-600 font-bold py-3 rounded-2xl text-sm hover:border-primary hover:text-primary transition-colors duration-300"
+                  >
+                    {t.modalClose}
+                  </motion.button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

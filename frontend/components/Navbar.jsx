@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLang } from '@/context/LanguageContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [appCount, setAppCount] = useState(0);
   const { lang, toggleLang, t } = useLang()
 
   useEffect(() => {
@@ -15,6 +17,21 @@ const Navbar = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Read application count from localStorage
+  useEffect(() => {
+    const read = () => {
+      try {
+        const apps = JSON.parse(localStorage.getItem('ss_applications') || '[]');
+        setAppCount(apps.length);
+      } catch { setAppCount(0); }
+    };
+    read();
+    window.addEventListener('storage', read);
+    // Poll every 2s to catch updates from same tab
+    const interval = setInterval(read, 2000);
+    return () => { window.removeEventListener('storage', read); clearInterval(interval); };
   }, []);
 
   const navLinks = [
@@ -58,6 +75,19 @@ const Navbar = () => {
               <span>{lang === 'en' ? '🇮🇳' : '🇬🇧'}</span>
               <span>{lang === 'en' ? 'हिंदी' : 'English'}</span>
             </button>
+
+            {/* My Applications */}
+            <Link
+              href="/tracker"
+              className="relative flex items-center gap-2 border-2 border-gray-200 text-gray-600 font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-all duration-300 text-sm whitespace-nowrap"
+            >
+              📊 My Applications
+              {appCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                  {appCount}
+                </span>
+              )}
+            </Link>
 
             <Link 
               href="#apply"
