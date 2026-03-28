@@ -1,2 +1,19 @@
+
 __pycache__/
 *.pyc
+=======
+# Python
+venv/
+backend/
+__pycache__/
+*.pyc
+
+# Env files
+.env
+
+# Node (if frontend exists)
+node_modules/
+
+# OS files
+.DS_Store
+>>>>>>> origin/main
